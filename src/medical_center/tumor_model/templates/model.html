@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Ввод данных пациента - Медицинский центр{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Заголовок -->
+    <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold text-medical-blue">Ввод данных пациента</h1>
+        <p class="lead text-muted">Введите полные данные пациента для персонализированного прогнозирования</p>
+    </div>
+
+    <form method="POST" action="{% url 'process_model' %}" class="medical-form">
+        {% csrf_token %}
+        
+        <!-- Основные данные пациента -->
+        <div class="medical-card">
+            <div class="medical-card-header">
+                <i class="fas fa-user me-2"></i>Основные данные пациента
+            </div>
+            <div class="medical-card-body">
+                <div class="row">
+                    <div class="col-md-4 medical-form-group">
+                        <label class="medical-form-label">Возраст пациента</label>
+                        <input type="number" class="form-control medical-form-control" name="age" required min="18" max="100">
+                    </div>
+                    <div class="col-md-4 medical-form-group">
+                        <label class="medical-form-label">Пол</label>
+                        <select class="form-select medical-form-control medical-form-select" name="gender" required>
+                            <option value="">Выберите пол</option>
+                            <option value="male">Мужской</option>
+                            <option value="female">Женский</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 medical-form-group">
+                        <label class="medical-form-label optional">Менопаузальный статус</label>
+                        <select class="form-select medical-form-control medical-form-select" name="menopause_status">
+                            <option value="">Не применимо</option>
+                            <option value="pre">Пременопауза</option>
+                            <option value="peri">Перименопауза</option>
+                            <option value="post">Постменопауза</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 medical-form-group">
+                        <label class="medical-form-label">Семейный анамнез по РМЖ</label>
+                        <select class="form-select medical-form-control medical-form-select" name="family_history" required>
+                            <option value="">Выберите вариант</option>
+                            <option value="no">Нет</option>
+                            <option value="first_degree">Родственники 1-й степени</option>
+                            <option value="second_degree">Родственники 2-й степени</option>
+                            <option value="multiple">Множественные случаи</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 medical-form-group">
+                        <label class="medical-form-label optional">Наличие генетических мутаций</label>
+                        <select class="form-select medical-form-control medical-form-select" name="genetic_mutations">
+                            <option value="none">Не выявлено</option>
+                            <option value="brca1">BRCA1</option>
+                            <option value="brca2">BRCA2</option>
+                            <option value="other">Другие</option>
+                            <option value="unknown">Не исследовалось</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Данные об опухоли -->
+        <div class="medical-card">
+            <div class="medical-card-header">
+                <i class="fas fa-tumor me-2"></i>Характеристики опухоли
+            </div>
+            <div class="medical-card-body">
+                <div class="row">
+                    <div class="col-md-4 medical-form-group">
+                        <label class="medical-form-label">Ki-67 уровень (%)</label>
+                        <input type="number" class="form-control medical-form-control" name="ki67" required min="1" max="100" step="0.1">
+                    </div>
+                    <div class="col-md-4 medical-form-group">
+                        <label class="medical-form-label">Гистологическая градация</label>
+                        <select class="form-select medical-form-control medical-form-select" name="histological_grade" required>
+                            <option value="">Выберите градацию</option>
+                            <option value="g1">G1 (Высокодифференцированная)</option>
+                            <option value="g2">G2 (Умеренно дифференцированная)</option>
+                            <option value="g3">G3 (Низкодифференцированная)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 medical-form-group">
+                        <label class="medical-form-label">Количество пораженных лимфоузлов</label>
+                        <input type="number" class="form-control medical-form-control" name="affected_lymph_nodes" required min="0" max="50">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Динамика размера опухоли -->
+        <div class="medical-card">
+            <div class="medical-card-header">
+                <i class="fas fa-chart-line me-2"></i>Динамика размера опухоли (мм)
+            </div>
+            <div class="medical-card-body">
+                <div class="timeline-section">
+                    <div class="timeline-grid">
+                        <div class="timeline-item">
+                            <div class="timeline-date">24 месяца назад</div>
+                            <input type="number" class="form-control medical-form-control" name="tumor_size_24m" min="0" max="200" step="0.1">
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">12 месяцев назад</div>
+                            <input type="number" class="form-control medical-form-control" name="tumor_size_12m" min="0" max="200" step="0.1">
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">6 месяцев назад</div>
+                            <input type="number" class="form-control medical-form-control" name="tumor_size_6m" min="0" max="200" step="0.1">
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">3 месяца назад</div>
+                            <input type="number" class="form-control medical-form-control" name="tumor_size_3m" min="0" max="200" step="0.1">
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">Текущий размер</div>
+                            <input type="number" class="form-control medical-form-control" name="tumor_size_current" required min="0" max="200" step="0.1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Хирургическое лечение -->
+        <div class="medical-card">
+            <div class="medical-card-header">
+                <i class="fas fa-scalpel me-2"></i>Хирургическое лечение
+            </div>
+            <div class="medical-card-body">
+                <div class="row">
+                    <div class="col-md-6 medical-form-group">
+                        <label class="medical-form-label">Проводилось ли хирургическое лечение?</label>
+                        <select class="form-select medical-form-control medical-form-select" name="surgery_performed" required id="surgery-toggle">
+                            <option value="no">Нет</option>
+                            <option value="yes">Да</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 medical-form-group" id="surgery-type-group" style="display: none;">
+                        <label class="medical-form-label">Тип операции</label>
+                        <select class="form-select medical-form-control medical-form-select" name="surgery_type">
+                            <option value="">Выберите тип операции</option>
+                            <option value="lumpectomy">Лампэктомия</option>
+                            <option value="mastectomy">Мастэктомия</option>
+                            <option value="radical">Радикальная мастэктомия</option>
+                            <option value="other">Другое</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Метастазы -->
+        <div class="medical-card">
+            <div class="medical-card-header">
+                <i class="fas fa-procedures me-2"></i>Метастатическое поражение
+            </div>
+            <div class="medical-card-body">
+                <div class="row">
+                    <div class="col-md-6 medical-form-group">
+                        <label class="medical-form-label">Наличие метастазов</label>
+                        <select class="form-select medical-form-control medical-form-select" name="metastasis_present" required id="metastasis-toggle">
+                            <option value="no">Нет</option>
+                            <option value="yes">Да</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 medical-form-group" id="metastasis-size-group" style="display: none;">
+                        <label class="medical-form-label">Размер наибольшего метастаза (мм)</label>
+                        <input type="number" class="form-control medical-form-control" name="metastasis_size" min="0" max="500" step="0.1">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Общее состояние -->
+        <div class="medical-card">
+            <div class="medical-card-header">
+                <i class="fas fa-heartbeat me-2"></i>Общее состояние пациента
+            </div>
+            <div class="medical-card-body">
+                <div class="row">
+                    <div class="col-md-6 medical-form-group">
+                        <label class="medical-form-label">Статус по шкале ECOG</label>
+                        <select class="form-select medical-form-control medical-form-select" name="ecog_status" required>
+                            <option value="">Выберите статус</option>
+                            <option value="0">0 - Полностью активен</option>
+                            <option value="1">1 - Ограниченно активен</option>
+                            <option value="2">2 - Амбулаторный</option>
+                            <option value="3">3 - Ограниченно самостоятельный</option>
+                            <option value="4">4 - Полностью нетрудоспособен</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 medical-form-group">
+                        <label class="medical-form-label optional">Дополнительные примечания</label>
+                        <textarea class="form-control medical-form-control" name="notes" rows="3" placeholder="Дополнительная информация о пациенте..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Кнопки отправки -->
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-medical btn-lg me-3">
+                <i class="fas fa-calculator me-2"></i>Рассчитать прогноз
+            </button>
+            <a href="{% url 'index' %}" class="btn btn-medical-secondary btn-lg">
+                <i class="fas fa-arrow-left me-2"></i>Назад
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+// Показ/скрытие полей в зависимости от выбора
+document.getElementById('surgery-toggle').addEventListener('change', function() {
+    document.getElementById('surgery-type-group').style.display = 
+        this.value === 'yes' ? 'block' : 'none';
+});
+
+document.getElementById('metastasis-toggle').addEventListener('change', function() {
+    document.getElementById('metastasis-size-group').style.display = 
+        this.value === 'yes' ? 'block' : 'none';
+});
+</script>
+{% endblock %}

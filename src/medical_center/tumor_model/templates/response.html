@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Результаты прогнозирования - Медицинский центр{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Заголовок -->
+    <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold text-medical-blue">Результаты прогнозирования</h1>
+        <p class="lead text-muted">Персонализированный прогноз на основе введенных данных</p>
+    </div>
+
+    <!-- Сводка пациента -->
+    <div class="medical-card mb-4">
+        <div class="medical-card-header">
+            <i class="fas fa-user-chart me-2"></i>Сводка по пациенту
+        </div>
+        <div class="medical-card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <strong>Возраст:</strong> {{ patient_data.age }} лет
+                </div>
+                <div class="col-md-3">
+                    <strong>Пол:</strong> {{ patient_data.gender_display }}
+                </div>
+                <div class="col-md-3">
+                    <strong>ECOG статус:</strong> {{ patient_data.ecog_status }}
+                </div>
+                <div class="col-md-3">
+                    <strong>Ki-67:</strong> {{ patient_data.ki67 }}%
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Прогноз выживаемости -->
+    <div class="survival-metric">
+        <div class="survival-value">{{ survival_prediction.months }} месяцев</div>
+        <div class="survival-label">Прогнозируемая общая выживаемость</div>
+        <div class="mt-3">
+            <span class="status-badge status-positive">95% ДИ: {{ survival_prediction.confidence_interval }}</span>
+        </div>
+    </div>
+
+    <!-- Ключевые метрики -->
+    <div class="metric-grid">
+        <div class="metric-item">
+            <div class="metric-value">{{ tumor_growth.final_size }} мм</div>
+            <div class="metric-label">Прогнозируемый размер через 6 месяцев</div>
+        </div>
+        <div class="metric-item">
+            <div class="metric-value">{{ tumor_growth.growth_rate }}%</div>
+            <div class="metric-label">Скорость роста опухоли</div>
+        </div>
+        <div class="metric-item">
+            <div class="metric-value">{{ treatment_optimization.effectiveness }}%</div>
+            <div class="metric-label">Эффективность текущего лечения</div>
+        </div>
+        <div class="metric-item">
+            <div class="metric-value">{{ risk_factors.recurrence_risk }}%</div>
+            <div class="metric-label">Риск рецидива</div>
+        </div>
+    </div>
+
+    <!-- Прогнозирование роста опухоли -->
+    <div class="medical-card">
+        <div class="medical-card-header">
+            <i class="fas fa-chart-line me-2"></i>Прогнозирование роста опухоли
+        </div>
+        <div class="medical-card-body">
+            <div class="medical-graph">
+                <div class="graph-placeholder">
+                    График динамики роста опухоли будет отображен здесь
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h6>Ключевые показатели роста:</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>Текущий размер:</strong> {{ patient_data.tumor_size_current }} мм</li>
+                        <li><strong>Прогноз через 3 месяца:</strong> {{ tumor_growth.projection_3m }} мм</li>
+                        <li><strong>Прогноз через 6 месяцев:</strong> {{ tumor_growth.projection_6m }} мм</li>
+                        <li><strong>Темп роста:</strong> {{ tumor_growth.growth_tempo }}</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>Факторы влияния:</h6>
+                    <div class="d-flex flex-wrap">
+                        {% for factor in tumor_growth.influencing_factors %}
+                        <span class="status-badge status-warning me-2 mb-2">{{ factor }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Оптимизация лечения -->
+    <div class="medical-card">
+        <div class="medical-card-header">
+            <i class="fas fa-pills me-2"></i>Оптимизация текущего лечения
+        </div>
+        <div class="medical-card-body">
+            <div class="treatment-recommendation">
+                <h6 class="mb-3">Рекомендации по оптимизации терапии:</h6>
+                <ul class="recommendation-list">
+                    {% for recommendation in treatment_optimization.recommendations %}
+                    <li>{{ recommendation }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h6>Текущие показатели эффективности:</h6>
+                    <div class="progress mb-2">
+                        <div class="progress-bar">
+                            {{ treatment_optimization.current_effectiveness }}%
+                        </div>
+                    </div>
+                    <small class="text-muted">Текущая эффективность лечения</small>
+                    
+                    <div class="progress mb-2">
+                        <div class="progress-bar bg-success">
+                            {{ treatment_optimization.optimized_effectiveness }}%
+                        </div>
+                    </div>
+                    <small class="text-muted">Прогнозируемая эффективность после оптимизации</small>
+                </div>
+                
+                <div class="col-md-6">
+                    <h6>Ожидаемые улучшения:</h6>
+                    <ul class="list-unstyled">
+                        <li>✅ Снижение токсичности на {{ treatment_optimization.toxicity_reduction }}%</li>
+                        <li>✅ Улучшение переносимости лечения</li>
+                        <li>✅ Снижение риска резистентности</li>
+                        <li>✅ Улучшение качества жизни</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Детальный прогноз выживаемости -->
+    <div class="medical-card">
+        <div class="medical-card-header">
+            <i class="fas fa-chart-bar me-2"></i>Детальный прогноз выживаемости
+        </div>
+        <div class="medical-card-body">
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    <div class="metric-value text-success">{{ survival_prediction.six_month }}%</div>
+                    <div class="metric-label">6-месячная выживаемость</div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="metric-value text-warning">{{ survival_prediction.one_year }}%</div>
+                    <div class="metric-label">1-годовая выживаемость</div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="metric-value text-danger">{{ survival_prediction.two_year }}%</div>
+                    <div class="metric-label">2-годовая выживаемость</div>
+                </div>
+            </div>
+            
+            <div class="medical-graph mt-4">
+                <div class="graph-placeholder">
+                    Кривая Каплана-Майера будет отображена здесь
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Факторы риска -->
+    <div class="medical-card">
+        <div class="medical-card-header">
+            <i class="fas fa-exclamation-triangle me-2"></i>Факторы риска и рекомендации
+        </div>
+        <div class="medical-card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Основные факторы риска:</h6>
+                    {% for risk in risk_factors.high_risks %}
+                    <div class="alert alert-warning d-flex align-items-center mb-2">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        {{ risk }}
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <h6>Положительные факторы:</h6>
+                    {% for factor in risk_factors.positive_factors %}
+                    <div class="alert alert-success d-flex align-items-center mb-2">
+                        <i class="fas fa-check-circle me-2"></i>
+                        {{ factor }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Кнопки действий -->
+    <div class="text-center mt-4">
+        <button class="btn btn-medical me-2" onclick="window.print()">
+            <i class="fas fa-print me-2"></i>Распечатать отчет
+        </button>
+        <a href="{% url 'model' %}" class="btn btn-medical-secondary me-2">
+            <i class="fas fa-redo me-2"></i>Новое моделирование
+        </a>
+        <a href="{% url 'index' %}" class="btn btn-medical-secondary">
+            <i class="fas fa-home me-2"></i>На главную
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,415 @@
+/* ===== MEDICAL THEME VARIABLES ===== */
+:root {
+    --medical-blue: #1a5276;
+    --medical-dark-blue: #154360;
+    --medical-light-blue: #2e86c1;
+    --medical-green: #27ae60;
+    --medical-red: #e74c3c;
+    --medical-orange: #f39c12;
+    --medical-purple: #8e44ad;
+    --medical-gray: #7f8c8d;
+    --medical-light: #ecf0f1;
+    --medical-dark: #2c3e50;
+    
+    --gradient-medical: linear-gradient(135deg, #1a5276 0%, #154360 100%);
+    --gradient-success: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+    --gradient-warning: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    --gradient-danger: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    
+    --shadow-medical: 0 4px 15px rgba(26, 82, 118, 0.1);
+    --shadow-hover: 0 8px 25px rgba(26, 82, 118, 0.15);
+    --border-radius: 10px;
+    --border-radius-lg: 15px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== BASE STYLES ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    color: var(--medical-dark);
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    min-height: 100vh;
+}
+
+/* ===== NAVIGATION ===== */
+.medical-navbar {
+    background: var(--gradient-medical) !important;
+    box-shadow: var(--shadow-medical);
+    padding: 1rem 0;
+    border-bottom: 3px solid var(--medical-green);
+}
+
+.medical-navbar .navbar-brand {
+    font-size: 1.4rem !important;
+    font-weight: 700;
+    color: white !important;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.medical-navbar .nav-link {
+    color: rgba(255,255,255,0.9) !important;
+    font-weight: 500;
+    padding: 0.5rem 1.25rem;
+    border-radius: 25px;
+    transition: var(--transition);
+    margin: 0 0.25rem;
+}
+
+.medical-navbar .nav-link:hover {
+    color: white !important;
+    background: rgba(255,255,255,0.15);
+    transform: translateY(-1px);
+}
+
+/* ===== MEDICAL CARDS ===== */
+.medical-card {
+    background: white;
+    border: none;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-medical);
+    transition: var(--transition);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+
+.medical-card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+}
+
+.medical-card-header {
+    background: var(--gradient-medical);
+    color: white;
+    padding: 1.25rem 1.5rem;
+    border-bottom: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.medical-card-body {
+    padding: 1.5rem;
+}
+
+/* ===== FORM STYLES ===== */
+.medical-form-group {
+    margin-bottom: 1.25rem;
+}
+
+.medical-form-label {
+    font-weight: 600;
+    color: var(--medical-dark);
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.medical-form-label::after {
+    content: '*';
+    color: var(--medical-red);
+    font-weight: bold;
+}
+
+.medical-form-label.optional::after {
+    content: '(опционально)';
+    color: var(--medical-gray);
+    font-size: 0.8rem;
+    font-weight: normal;
+    margin-left: auto;
+}
+
+.medical-form-control {
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    transition: var(--transition);
+    background: #fff;
+}
+
+.medical-form-control:focus {
+    border-color: var(--medical-light-blue);
+    box-shadow: 0 0 0 3px rgba(46, 134, 193, 0.1);
+    background: #f8fafc;
+}
+
+.medical-form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 16px 12px;
+}
+
+/* ===== BUTTONS ===== */
+.btn-medical {
+    background: var(--gradient-medical);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.875rem 2rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: var(--transition);
+    box-shadow: var(--shadow-medical);
+}
+
+.btn-medical:hover {
+    background: var(--medical-dark-blue);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+    color: white;
+}
+
+.btn-medical-secondary {
+    background: white;
+    color: var(--medical-blue);
+    border: 2px solid var(--medical-blue);
+}
+
+.btn-medical-secondary:hover {
+    background: var(--medical-blue);
+    color: white;
+}
+
+/* ===== TIMELINE FOR TUMOR SIZE ===== */
+.timeline-section {
+    background: #f8fafc;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin: 1rem 0;
+}
+
+.timeline-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.timeline-item {
+    text-align: center;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    border-left: 4px solid var(--medical-blue);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.timeline-date {
+    font-weight: 600;
+    color: var(--medical-blue);
+    margin-bottom: 0.5rem;
+}
+
+/* ===== RESULTS STYLES ===== */
+.prognosis-card {
+    background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+    border-left: 4px solid var(--medical-green);
+}
+
+.danger-card {
+    border-left: 4px solid var(--medical-red);
+}
+
+.warning-card {
+    border-left: 4px solid var(--medical-orange);
+}
+
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.metric-item {
+    text-align: center;
+    padding: 1.5rem;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-medical);
+    border-top: 3px solid var(--medical-blue);
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--medical-blue);
+    margin-bottom: 0.5rem;
+}
+
+.metric-label {
+    color: var(--medical-gray);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* ===== SURVIVAL PREDICTION ===== */
+.survival-metric {
+    background: linear-gradient(135deg, var(--medical-blue), var(--medical-dark-blue));
+    color: white;
+    padding: 2rem;
+    border-radius: var(--border-radius-lg);
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.survival-value {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.survival-label {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* ===== TREATMENT OPTIMIZATION ===== */
+.treatment-recommendation {
+    background: linear-gradient(135deg, #e8f5e8, #d5eed5);
+    border-left: 4px solid var(--medical-green);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    margin: 1rem 0;
+}
+
+.recommendation-list {
+    list-style: none;
+    padding: 0;
+}
+
+.recommendation-list li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.recommendation-list li:last-child {
+    border-bottom: none;
+}
+
+.recommendation-list li::before {
+    content: '💡';
+    font-size: 1.1rem;
+}
+
+/* ===== GRAPH PLACEHOLDER ===== */
+.medical-graph {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    margin: 2rem 0;
+    box-shadow: var(--shadow-medical);
+}
+
+.graph-placeholder {
+    background: linear-gradient(45deg, #f8fafc, #e2e8f0);
+    border: 2px dashed #cbd5e0;
+    border-radius: 8px;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--medical-gray);
+    font-weight: 500;
+}
+
+/* ===== STATUS INDICATORS ===== */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin: 0.25rem;
+}
+
+.status-positive {
+    background: #d5f4e6;
+    color: var(--medical-green);
+}
+
+.status-negative {
+    background: #fde8e8;
+    color: var(--medical-red);
+}
+
+.status-warning {
+    background: #fef5e7;
+    color: var(--medical-orange);
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    .timeline-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .metric-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .medical-card-body {
+        padding: 1rem;
+    }
+    
+    .survival-value {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .timeline-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .medical-navbar .navbar-brand {
+        font-size: 1.1rem !important;
+    }
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+    .medical-navbar, .btn, footer {
+        display: none !important;
+    }
+    
+    .medical-card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        break-inside: avoid;
+    }
+}
+
+/* ===== CUSTOM SCROLLBAR ===== */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--medical-blue);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--medical-dark-blue);
+}
