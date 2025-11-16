@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 import json
-from .models import Patient ####---добавила
+from .models import BreastCancerData 
 
 def index(request):
     """Главная страница"""
@@ -12,61 +12,49 @@ def model_view(request):
     return render(request, 'model.html')
 
 def process_model(request):
-    """Обработка данных формы и отображение результатов"""
     if request.method == 'POST':
-        # Получаем данные из формы
-        patient_data = {
-            'age': request.POST.get('patient_age'),
-            'weight': request.POST.get('patient_weight'),
-            'cancer_type': request.POST.get('cancer_type'),
-            'tumor_size': request.POST.get('tumor_size'),
-            'growth_rate': request.POST.get('growth_rate'),
-            'resistance_level': request.POST.get('resistance_level'),
-            'drug_name': request.POST.get('drug_name'),
-            'drug_dose': request.POST.get('drug_dose'),
-            'treatment_interval': request.POST.get('treatment_interval'),
-            'treatment_duration': request.POST.get('treatment_duration'),
-        }
+        try:
+            # Собираем данные из формы
+            metastasis_sites = request.POST.getlist('metastasis_sites')
+            
+            patient_data = {
+                'full_name': request.POST.get('full_name'),
+                'stage': int(request.POST.get('stage')),
+                'age': int(request.POST.get('age')),
+                'gender': request.POST.get('gender'),
+                'menopausal_status': request.POST.get('menopausal_status') if request.POST.get('gender') == 'female' else 'not_applicable',
+                'family_history': request.POST.get('family_history'),
+                'brca_mutation': request.POST.get('brca_mutation'),
+                'molecular_subtype': request.POST.get('molecular_subtype'),
+                'er_status': request.POST.get('er_status'),
+                'pr_status': request.POST.get('pr_status'),
+                'her2_status': request.POST.get('her2_status'),
+                'ki67_level': float(request.POST.get('ki67_level')),
+                'tumor_grade': request.POST.get('tumor_grade'),
+                'tumor_size_before': float(request.POST.get('tumor_size_before')),
+                'tumor_size_3m': float(request.POST.get('tumor_size_3m') or 0),
+                'tumor_size_6m': float(request.POST.get('tumor_size_6m') or 0),
+                'tumor_size_12m': float(request.POST.get('tumor_size_12m') or 0),
+                'tumor_size_24m': float(request.POST.get('tumor_size_24m') or 0),
+                'treatment': request.POST.get('treatment'),
+                'surgery_type': request.POST.get('surgery_type'),
+                'has_metastasis': request.POST.get('has_metastasis'),
+                'metastasis_size': float(request.POST.get('metastasis_size') or 0),
+                'metastasis_sites': ','.join(metastasis_sites),
+                'lymph_node_status': request.POST.get('lymph_node_status'),
+                'positive_lymph_nodes': int(request.POST.get('positive_lymph_nodes')),
+                'performance_status': int(request.POST.get('performance_status')),
+            }
 
-        # СОХРАНЕНИЕ В БАЗУ ДАННЫХ ← ДОБАВЛЕНО
-    try:
-        patient = Patient.objects.create(
-            age=int(patient_data['age']),
-            # Заполните остальные поля по мере необходимости
-            tumor_size_before=float(patient_data['tumor_size']),
-            treatment=patient_data['drug_name'],
-            # Добавьте другие поля из вашей формы
-        )
-        patient_hash = patient.patient_hash
-    except Exception as e:
-        patient_hash = None
-        print(f"Ошибка сохранения в БД: {e}")
-        
-        # ВРЕМЕННЫЕ ДАННЫЕ - заглушка для модели
-        # Здесь будет подключена реальная математическая модель
-        
-        simulation_results = {
-            'final_tumor_size': round(float(patient_data['tumor_size']) * 0.65, 1),  # заглушка
-            'tumor_reduction': 35,  # заглушка
-            'treatment_effectiveness': 'Высокая',  # заглушка
-            'patient_id': patient_hash,
-        }
-        
-        recommendations = {
-            'optimized_dose': round(float(patient_data['drug_dose']) * 0.8, 1),  # заглушка
-            'optimized_interval': int(patient_data['treatment_interval']) - 1,  # заглушка
-            'optimized_duration': int(patient_data['treatment_duration']) + 7,  # заглушка
-            'toxicity_reduction': 25,  # заглушка
-            'effectiveness_improvement': 15,  # заглушка
-        }
-        
-        context = {
-            'patient_data': patient_data,
-            'simulation_results': simulation_results,
-            'recommendations': recommendations,
-        }
-        
-        return render(request, 'response.html', context)
+            # Сохраняем в базу данных через модель Django
+            patient = BreastCancerData(**patient_data)
+            patient.save()
+
+            # Перенаправляем на страницу результатов
+            return redirect('response')
+            
+        except Exception as e:
+            return render(request, 'model.html', {'error': str(e)})
     
     return redirect('model')
 
@@ -94,7 +82,7 @@ def patient_form(request):
     if request.method == 'POST':
         # Сохранение данных пациента в БД
         try:
-            patient = Patient.objects.create(
+            patient = BreastCancerData.objects.create(
                 stage=request.POST.get('stage'),
                 age=int(request.POST.get('age')),
                 gender=request.POST.get('gender'),

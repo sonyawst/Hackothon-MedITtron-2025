@@ -1,5 +1,6 @@
 from pathlib import Path
 import environ
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -104,7 +105,21 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'tumor_model', 'static'),
+]
+
+# ДЛЯ ОТЛАДКИ - добавьте это
+print("=== STATIC FILES DEBUG ===")
+print("BASE_DIR:", BASE_DIR)
+print("STATICFILES_DIRS:", STATICFILES_DIRS)
+
+# Проверим существование файла
+css_path = os.path.join(BASE_DIR, 'tumor_model', 'static', 'tumor_model', 'css', 'styles.css')
+print("CSS file exists:", os.path.exists(css_path))
+print("CSS path:", css_path)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -113,4 +128,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 env = environ.Env()
 environ.Env.read_env()
-

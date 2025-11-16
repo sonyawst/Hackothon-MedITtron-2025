@@ -1,0 +1,474 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Ввод данных пациента - Медицинский центр{% endblock %}
+
+{% block content %}
+<div class="animated-bg"></div>
+
+<div class="container py-5">
+    <!-- Анимированный заголовок -->
+    <div class="text-center mb-5 fade-in-up">
+        <h1 class="display-4 fw-bold mb-4" style="background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+            Оценка пациента с раком молочной железы
+        </h1>
+        <p class="lead text-muted">Персонализированное прогнозирование на основе современных математических моделей</p>
+        <div class="progress mt-4" style="height: 8px; max-width: 400px; margin: 0 auto; background: rgba(99, 102, 241, 0.2); border-radius: 10px;">
+            <div class="progress-bar" style="width: 100%; background: var(--gradient-primary); border-radius: 10px;"></div>
+        </div>
+    </div>
+
+    <form method="POST" action="{% url 'process_model' %}" class="medical-form" id="patientForm">
+        {% csrf_token %}
+        
+        <!-- Основная информация о пациенте -->
+        <div class="glass-card fade-in-up">
+            <div class="glass-card-header">
+                <i class="fas fa-user-circle"></i>Основная информация
+            </div>
+            <div class="glass-card-body">
+                <div class="row">
+                    <div class="col-md-6 glass-form-group">
+                        <label class="glass-form-label">
+                            <i class="fas fa-signature"></i>ФИО пациента
+                        </label>
+                        <input type="text" class="form-control glass-form-control" name="full_name" required 
+                               placeholder="Иванова Мария Петровна">
+                    </div>
+                    <div class="col-md-3 glass-form-group">
+                        <label class="glass-form-label">
+                            <i class="fas fa-birthday-cake"></i>Возраст
+                        </label>
+                        <input type="number" class="form-control glass-form-control" name="age" required min="18" max="100">
+                    </div>
+                    <div class="col-md-3 glass-form-group">
+                        <label class="glass-form-label">
+                            <i class="fas fa-stethoscope"></i>Стадия
+                        </label>
+                        <select class="form-select glass-form-control glass-form-select" name="stage" required id="stage-select">
+                            <option value="">Выберите стадию</option>
+                            <option value="2">II стадия</option>
+                        </select>
+                        <div class="stage-warning mt-2">
+                            <i class="fas fa-info-circle me-2"></i>
+                            На данный момент доступен выбор только II стадии
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-md-4 glass-form-group">
+                        <label class="glass-form-label">
+                            <i class="fas fa-venus-mars"></i>Пол
+                        </label>
+                        <div class="toggle-group">
+                            <div class="toggle-option">
+                                <input type="radio" id="gender_male" name="gender" value="male" class="toggle-input" required>
+                                <label for="gender_male" class="toggle-label">Мужской</label>
+                            </div>
+                            <div class="toggle-option">
+                                <input type="radio" id="gender_female" name="gender" value="female" class="toggle-input" required>
+                                <label for="gender_female" class="toggle-label">Женский</label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Обновленная секция менопаузального статуса -->
+                    <div class="col-md-4 glass-form-group" id="menopausal-group">
+                        <label class="glass-form-label">
+                            <i class="fas fa-venus"></i>Менопаузальный статус
+                        </label>
+                        <div class="toggle-group">
+                            <div class="toggle-option">
+                                <input type="radio" id="menopause_pre" name="menopausal_status" value="premenopausal" class="toggle-input">
+                                <label for="menopause_pre" class="toggle-label">Пременопауза</label>
+                            </div>
+                            <div class="toggle-option">
+                                <input type="radio" id="menopause_peri" name="menopausal_status" value="perimenopausal" class="toggle-input">
+                                <label for="menopause_peri" class="toggle-label">Перименопауза</label>
+                            </div>
+                            <div class="toggle-option">
+                                <input type="radio" id="menopause_post" name="menopausal_status" value="postmenopausal" class="toggle-input">
+                                <label for="menopause_post" class="toggle-label">Постменопауза</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 glass-form-group">
+                        <label class="glass-form-label">
+                            <i class="fas fa-heartbeat"></i>Статус по шкале ECOG
+                        </label>
+                        <div class="toggle-group">
+                            {% for i in "01234" %}
+                            <div class="toggle-option">
+                                <input type="radio" id="ecog_{{ i }}" name="performance_status" value="{{ i }}" 
+                                       class="toggle-input" {% if forloop.first %}required{% endif %}>
+                                <label for="ecog_{{ i }}" class="toggle-label">{{ i }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Анамнез и генетика -->
+        <div class="glass-card fade-in-up" style="animation-delay: 0.1s;">
+            <div class="glass-card-header">
+                <i class="fas fa-dna"></i>Анамнез и генетика
+            </div>
+            <div class="glass-card-body">
+                <div class="row">
+                    <div class="col-md-6 glass-form-group">
+                        <label class="glass-form-label">
+                            <i class="fas fa-family"></i>Семейный анамнез РМЖ
+                        </label>
+                        <div class="toggle-group">
+                            <div class="toggle-option">
+                                <input type="radio" id="family_no" name="family_history" value="no" class="toggle-input" required>
+                                <label for="family_no" class="toggle-label">Нет</label>
+                            </div>
+                            <div class="toggle-option">
+                                <input type="radio" id="family_yes" name="family_history" value="yes" class="toggle-input" required>
+                                <label for="family_yes" class="toggle-label">Да</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 glass-form-group">
+                        <label class="glass-form-label">
+                            <i class="fas fa-microscope"></i>Мутация BRCA
+                        </label>
+                        <div class="toggle-group">
+                            <div class="toggle-option">
+                                <input type="radio" id="brca_no" name="brca_mutation" value="no" class="toggle-input" required>
+                                <label for="brca_no" class="toggle-label">Нет</label>
+                            </div>
+                            <div class="toggle-option">
+                                <input type="radio" id="brca_yes" name="brca_mutation" value="yes" class="toggle-input" required>
+                                <label for="brca_yes" class="toggle-label">Да</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Характеристики опухоли -->
+        <div class="glass-card fade-in-up" style="animation-delay: 0.2s;">
+            <div class="glass-card-header">
+                <i class="fas fa-tumor"></i>Характеристики опухоли
+            </div>
+            <div class="glass-card-body">
+                <div class="row">
+                    <div class="col-md-4 glass-form-group">
+                        <label class="glass-form-label">
+                            <i class="fas fa-dna"></i>Молекулярный подтип
+                        </label>
+                        <select class="form-select glass-form-control glass-form-select" name="molecular_subtype" required>
+                            <option value="">Выберите подтип</option>
+                            <option value="HR+HER2-">HR+HER2-</option>
+                            <option value="HR+HER2+">HR+HER2+</option>
+                            <option value="HR-HER2+">HR-HER2+</option>
+                            <option value="TNBC">TNBC (Трижды негативный)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 glass-form-group">
+                        <label class="glass-form-label">ER статус</label>
+                        <div class="toggle-group">
+                            <div class="toggle-option">
+                                <input type="radio" id="er_negative" name="er_status" value="negative" class="toggle-input" required>
+                                <label for="er_negative" class="toggle-label">Отрицательный</label>
+                            </div>
+                            <div class="toggle-option">
+                                <input type="radio" id="er_positive" name="er_status" value="positive" class="toggle-input" required>
+                                <label for="er_positive" class="toggle-label">Положительный</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 glass-form-group">
+                        <label class="glass-form-label">PR статус</label>
+                        <div class="toggle-group">
+                            <div class="toggle-option">
+                                <input type="radio" id="pr_negative" name="pr_status" value="negative" class="toggle-input" required>
+                                <label for="pr_negative" class="toggle-label">Отрицательный</label>
+                            </div>
+                            <div class="toggle-option">
+                                <input type="radio" id="pr_positive" name="pr_status" value="positive" class="toggle-input" required>
+                                <label for="pr_positive" class="toggle-label">Положительный</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-md-4 glass-form-group">
+                        <label class="glass-form-label">HER2 статус</label>
+                        <div class="toggle-group">
+                            <div class="toggle-option">
+                                <input type="radio" id="her2_negative" name="her2_status" value="negative" class="toggle-input" required>
+                                <label for="her2_negative" class="toggle-label">Отрицательный</label>
+                            </div>
+                            <div class="toggle-option">
+                                <input type="radio" id="her2_positive" name="her2_status" value="positive" class="toggle-input" required>
+                                <label for="her2_positive" class="toggle-label">Положительный</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 glass-form-group">
+                        <label class="glass-form-label">
+                            <i class="fas fa-chart-line"></i>Уровень Ki-67 (%)
+                        </label>
+                        <input type="number" class="form-control glass-form-control" name="ki67_level" required 
+                               min="1" max="100" step="0.1" value="15">
+                    </div>
+                    <div class="col-md-4 glass-form-group">
+                        <label class="glass-form-label">Гистологическая градация</label>
+                        <div class="toggle-group">
+                            {% for i in "123" %}
+                            <div class="toggle-option">
+                                <input type="radio" id="grade_{{ i }}" name="tumor_grade" value="G{{ i }}" 
+                                       class="toggle-input" {% if forloop.first %}required{% endif %}>
+                                <label for="grade_{{ i }}" class="toggle-label">G{{ i }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Динамика размера опухоли -->
+        <div class="glass-card fade-in-up" style="animation-delay: 0.3s;">
+            <div class="glass-card-header">
+                <i class="fas fa-chart-line"></i>Динамика размера опухоли (см)
+            </div>
+            <div class="glass-card-body">
+                <div class="timeline-section">
+                    <div class="timeline-grid">
+                        <div class="timeline-item">
+                            <div class="timeline-date">До лечения</div>
+                            <input type="number" class="form-control glass-form-control" name="tumor_size_before" 
+                                   required min="0.1" max="20" step="0.1" placeholder="0.0">
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">Через 3 месяца</div>
+                            <input type="number" class="form-control glass-form-control" name="tumor_size_3m" 
+                                   min="0" max="20" step="0.1" placeholder="0.0">
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">Через 6 месяцев</div>
+                            <input type="number" class="form-control glass-form-control" name="tumor_size_6m" 
+                                   min="0" max="20" step="0.1" placeholder="0.0">
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">Через 12 месяцев</div>
+                            <input type="number" class="form-control glass-form-control" name="tumor_size_12m" 
+                                   min="0" max="20" step="0.1" placeholder="0.0">
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-date">Через 24 месяца</div>
+                            <input type="number" class="form-control glass-form-control" name="tumor_size_24m" 
+                                   min="0" max="20" step="0.1" placeholder="0.0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Лечение -->
+        <div class="glass-card fade-in-up" style="animation-delay: 0.4s;">
+            <div class="glass-card-header">
+                <i class="fas fa-pills"></i>Лечение
+            </div>
+            <div class="glass-card-body">
+                <div class="row">
+                    <div class="col-md-6 glass-form-group">
+                        <label class="glass-form-label">
+                            <i class="fas fa-stethoscope"></i>Тип лечения
+                        </label>
+                        <select class="form-select glass-form-control glass-form-select" name="treatment" required id="treatment-select">
+                            <option value="">Выберите тип лечения</option>
+                            <option value="surgery">Хирургическое лечение</option>
+                            <option value="surgery_chemotherapy">Хирургия и Химиотерапия</option>
+                            <option value="surgery_targeted">Хирургия и Таргетная терапия</option>
+                            <option value="none">Лечение не проводилось</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 glass-form-group" id="surgery-type-group">
+                        <label class="glass-form-label">
+                            <i class="fas fa-scalpel"></i>Тип операции
+                        </label>
+                        <select class="form-select glass-form-control glass-form-select" name="surgery_type">
+                            <option value="">Выберите операцию</option>
+                            <option value="lumpectomy">Лампэктомия</option>
+                            <option value="mastectomy">Мастэктомия</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Метастазы и лимфоузлы -->
+        <div class="glass-card fade-in-up" style="animation-delay: 0.5s;">
+            <div class="glass-card-header">
+                <i class="fas fa-procedures"></i>Метастазы и лимфоузлы
+            </div>
+            <div class="glass-card-body">
+                <div class="row">
+                    <div class="col-md-4 glass-form-group">
+                        <label class="glass-form-label">Наличие отдаленных метастазов</label>
+                        <div class="toggle-group">
+                            <div class="toggle-option">
+                                <input type="radio" id="metastasis_no" name="has_metastasis" value="no" class="toggle-input" required>
+                                <label for="metastasis_no" class="toggle-label">Нет</label>
+                            </div>
+                            <div class="toggle-option">
+                                <input type="radio" id="metastasis_yes" name="has_metastasis" value="yes" class="toggle-input" required>
+                                <label for="metastasis_yes" class="toggle-label">Да</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 glass-form-group" id="metastasis-size-group" style="display: none;">
+                        <label class="glass-form-label">Размер метастаза (см)</label>
+                        <input type="number" class="form-control glass-form-control" name="metastasis_size" 
+                               min="0.1" max="15" step="0.1" placeholder="0.0">
+                    </div>
+                    <div class="col-md-4 glass-form-group" id="metastasis-location-group" style="display: none;">
+                        <label class="glass-form-label">Локализация метастазов</label>
+                        <div class="checkbox-grid">
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="meta_bone" name="metastasis_sites" value="bone">
+                                <label for="meta_bone">Кости</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="meta_liver" name="metastasis_sites" value="liver">
+                                <label for="meta_liver">Печень</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="meta_lung" name="metastasis_sites" value="lung">
+                                <label for="meta_lung">Легкие</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="meta_brain" name="metastasis_sites" value="brain">
+                                <label for="meta_brain">Головной мозг</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6 glass-form-group">
+                        <label class="glass-form-label">Статус лимфоузлов</label>
+                        <div class="toggle-group">
+                            <div class="toggle-option">
+                                <input type="radio" id="nodes_negative" name="lymph_node_status" value="negative" class="toggle-input" required>
+                                <label for="nodes_negative" class="toggle-label">Отрицательный</label>
+                            </div>
+                            <div class="toggle-option">
+                                <input type="radio" id="nodes_positive" name="lymph_node_status" value="positive" class="toggle-input" required id="nodes-positive">
+                                <label for="nodes_positive" class="toggle-label">Положительный</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 glass-form-group" id="lymph-nodes-count-group" style="display: none;">
+                        <label class="glass-form-label">Количество пораженных лимфоузлов</label>
+                        <input type="number" class="form-control glass-form-control" name="positive_lymph_nodes" 
+                               min="0" max="50" value="0">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Кнопки отправки -->
+        <div class="text-center mt-5 fade-in-up" style="animation-delay: 0.6s;">
+            <button type="submit" class="btn btn-glass btn-lg me-3 pulse-hover">
+                <i class="fas fa-calculator me-2"></i>Рассчитать прогноз
+            </button>
+            <button type="reset" class="btn btn-glass-secondary btn-lg me-3">
+                <i class="fas fa-undo me-2"></i>Очистить форму
+            </button>
+            <a href="{% url 'index' %}" class="btn btn-glass-secondary btn-lg">
+                <i class="fas fa-arrow-left me-2"></i>На главную
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Менопаузальный статус только для женщин
+    const genderInputs = document.querySelectorAll('input[name="gender"]');
+    const menopausalGroup = document.getElementById('menopausal-group');
+    
+    genderInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            if (this.value === 'male') {
+                menopausalGroup.style.opacity = '0.5';
+                menopausalGroup.style.pointerEvents = 'none';
+                document.querySelectorAll('input[name="menopausal_status"]').forEach(radio => {
+                    radio.checked = false;
+                });
+            } else {
+                menopausalGroup.style.opacity = '1';
+                menopausalGroup.style.pointerEvents = 'auto';
+            }
+        });
+    });
+
+    // Показать/скрыть детали метастазов
+    const metastasisInputs = document.querySelectorAll('input[name="has_metastasis"]');
+    const metastasisSizeGroup = document.getElementById('metastasis-size-group');
+    const metastasisLocationGroup = document.getElementById('metastasis-location-group');
+    
+    metastasisInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            const show = this.value === 'yes';
+            metastasisSizeGroup.style.display = show ? 'block' : 'none';
+            metastasisLocationGroup.style.display = show ? 'block' : 'none';
+        });
+    });
+
+    // Тип операции доступен только при выборе лечения с хирургией
+    const treatmentSelect = document.getElementById('treatment-select');
+    const surgeryTypeGroup = document.getElementById('surgery-type-group');
+    
+    treatmentSelect.addEventListener('change', function() {
+        const showSurgery = this.value !== 'none' && this.value !== '';
+        surgeryTypeGroup.style.display = showSurgery ? 'block' : 'none';
+        if (!showSurgery) {
+            surgeryTypeGroup.querySelector('select').value = '';
+        }
+    });
+
+    // Количество лимфоузлов доступно только при положительном статусе
+    const nodesPositive = document.getElementById('nodes-positive');
+    const lymphNodesCountGroup = document.getElementById('lymph-nodes-count-group');
+    
+    document.querySelectorAll('input[name="lymph_node_status"]').forEach(input => {
+        input.addEventListener('change', function() {
+            lymphNodesCountGroup.style.display = this.value === 'positive' ? 'block' : 'none';
+            if (this.value !== 'positive') {
+                lymphNodesCountGroup.querySelector('input').value = '0';
+            }
+        });
+    });
+
+    // Авто-форматирование чисел
+    document.querySelectorAll('input[type="number"]').forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.value && this.step === '0.1') {
+                this.value = parseFloat(this.value).toFixed(1);
+            }
+        });
+    });
+
+    // Плавная прокрутка к ошибкам
+    const form = document.getElementById('patientForm');
+    form.addEventListener('submit', function(e) {
+        const firstError = this.querySelector('.error:first-child');
+        if (firstError) {
+            e.preventDefault();
+            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    });
+});
+</script>
+{% endblock %}
