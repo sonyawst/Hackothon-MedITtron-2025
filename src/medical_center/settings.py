@@ -65,8 +65,12 @@ WSGI_APPLICATION = 'medical_center.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'hackathon',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -111,20 +115,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'tumor_model', 'static'),
 ]
 
-# ДЛЯ ОТЛАДКИ - добавьте это
-print("=== STATIC FILES DEBUG ===")
-print("BASE_DIR:", BASE_DIR)
-print("STATICFILES_DIRS:", STATICFILES_DIRS)
-
-# Проверим существование файла
-css_path = os.path.join(BASE_DIR, 'tumor_model', 'static', 'tumor_model', 'css', 'styles.css')
-print("CSS file exists:", os.path.exists(css_path))
-print("CSS path:", css_path)
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-env = environ.Env()
-environ.Env.read_env()
