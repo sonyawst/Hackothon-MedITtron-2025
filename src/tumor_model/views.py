@@ -82,19 +82,47 @@ def process_model(request):
             request.session['last_patient_id'] = patient.id
             print(f"=== DEBUG: Session set with patient ID: {patient.id} ===")
 
-            # Перенаправляем на страницу результатов
+            # Получаем предсказания от ML модели          
+            if predictor and predictor.model_loaded:
+                print(f"=== DEBUG: Model type: {type(predictor.model)}")
+                print(f"=== DEBUG: Model has predict: {hasattr(predictor.model, 'predict')}")
+                ml_predictions = predictor.predict_best_treatment(patient)
+                print(f"=== DEBUG: ML predictions received: {ml_predictions is not None} ===")
+            else:
+                raise Exception("ML модель не загружена или недоступна")
+            
+            # Формируем данные пациента для шаблона
+            patient_data_dict = {
+                'full_name': patient.full_name,
+                'age': patient.age,
+                'stage': patient.stage,
+                'ki67_level': patient.ki67_level,
+                'tumor_size_before': patient.tumor_size_before,
+                'er_status': patient.er_status,
+                'pr_status': patient.pr_status,
+                'her2_status': patient.her2_status,
+                'brca_mutation': patient.brca_mutation,
+                'molecular_subtype': patient.molecular_subtype,  
+                'gender': patient.gender,
+                'menopausal_status': patient.menopausal_status
+            }
+            
             print("=== DEBUG: Redirecting to response page ===")
-            return redirect('response')
+            return render(request, 'response.html', {
+                'patient_data': patient_data_dict,
+                'ml_predictions': ml_predictions
+            })
+        
             
         except Exception as e:
-            # В случае ошибки показываем форму снова
-            error_msg = f'Ошибка при сохранении данных: {str(e)}'
+            # В случае ошибки показываем сообщение об ошибке
+            error_msg = f'Ошибка при обработке данных: {str(e)}'
             print(f"=== DEBUG: ERROR: {error_msg} ===")
             import traceback
             traceback.print_exc()
             return render(request, 'model.html', {'error': error_msg})
     
-    return redirect('model_view')
+    return redirect('model')
 
 def response_view(request):
     """Страница результатов с ML предсказаниями"""
@@ -106,31 +134,36 @@ def response_view(request):
         else:
             patient = BreastCancerData.objects.latest('created_at')
     except BreastCancerData.DoesNotExist:
-        # Если нет записей, используем демо-данные
-        patient = None
+        # Если нет записей, показываем ошибку
+        return render(request, 'error.html', {
+            'error_message': 'Нет данных пациента для анализа'
+        })
 
     # Получаем предсказания от ML модели
     ml_predictions = None
-    if predictor and patient:
-        ml_predictions = predictor.predict_best_treatment(patient)
-    elif predictor is None:
-        # Если модель не загружена, используем демо-предсказания
-        from .ml_predictor import TreatmentPredictor
-        demo_predictor = TreatmentPredictor('')
-        ml_predictions = demo_predictor._get_demo_predictions()
+    if predictor and predictor.model_loaded:
+        try:
+            ml_predictions = predictor.predict_best_treatment(patient)
+        except Exception as e:
+            return render(request, 'error.html', {
+                'error_message': f'Ошибка ML предсказания: {str(e)}'
+            })
+    else:
+        return render(request, 'error.html', {
+            'error_message': 'ML модель не загружена'
+        })
 
     # Формируем контекст для шаблона
     context = {
         'patient_data': {
-            'full_name': patient.full_name if patient else 'Иванова Мария Петровна',
-            'age': patient.age if patient else 45,
-            'stage': patient.stage if patient else 'II',
-            'gender': 'Мужской' if patient and patient.gender == 'male' else 'Женский',
-            'ki67_level': patient.ki67_level if patient else 25.0,
-            'tumor_size_before': patient.tumor_size_before if patient else 3.5,
-            'er_status': patient.er_status if patient else 'positive',
-            'her2_status': patient.her2_status if patient else 'positive',
-            'brca_mutation': patient.brca_mutation if patient else 'no'
+            'full_name': patient.full_name,
+            'age': patient.age,
+            'stage': patient.stage,
+            'ki67_level': patient.ki67_level,
+            'tumor_size_before': patient.tumor_size_before,
+            'er_status': patient.er_status,
+            'her2_status': patient.her2_status,
+            'brca_mutation': patient.brca_mutation
         },
         'ml_predictions': ml_predictions,
         'survival_prediction': {
