@@ -1,38 +1,6 @@
 from django.db import models
 
 # utils.py
-def django_to_ml_format(patient):
-    """Преобразует Django пациента в ML-формат"""
-    
-    ml_data = {
-        # Основные признаки
-        'age': patient.age,
-        'menopausal_status': patient.menopausal_status,
-        'family_history': patient.family_history_bool,
-        'molecular_subtype': patient.molecular_subtype,
-        'er_status': patient.er_status_bool,
-        'pr_status': patient.pr_status_bool, 
-        'her2_status': patient.her2_status_bool,
-        'brca_mutation': patient.brca_mutation_bool,
-        'ki67_level': patient.ki67_level,
-        'treatment': patient.treatment,
-        'surgery_type': patient.surgery_type,
-        'tumor_size_before': patient.tumor_size_before,
-        'performance_status': patient.performance_status,
-        'tumor_grade': patient.tumor_grade,
-        'lymph_node_status': patient.lymph_node_status_bool,
-        'positive_lymph_nodes': patient.positive_lymph_nodes,
-        'has_metastasis': patient.has_metastasis_bool,
-        
-        # Целевая переменная для обучения
-        'tumor_change_percentage': patient.tumor_change_percentage,
-        
-        # Дополнительные данные
-        'treatment_response': patient.treatment_response,
-        'survival_months': patient.survival_months,
-    }
-    
-    return ml_data
 
 class BreastCancerData(models.Model):
     # Основная информация
