@@ -1,5 +1,35 @@
 from django.db import models
 
+class Patients(models.Model):
+    patient_hash = models.AutoField(primary_key=True)
+    age = models.IntegerField()
+    gender = models.CharField(max_length=10)
+    menopausal_status = models.CharField(max_length=20, blank=True, null=True)
+    family_history = models.BooleanField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'patients'
+
+class PathologicalProfiles(models.Model):
+    profile_id = models.AutoField(primary_key=True)
+    patient_hash = models.ForeignKey('Patients', on_delete=models.CASCADE)
+    molecular_subtype = models.CharField(max_length=50, blank=True, null=True)
+    er_status = models.CharField(max_length=10, blank=True, null=True)
+    pr_status = models.CharField(max_length=10, blank=True, null=True)
+    her2_status = models.CharField(max_length=10, blank=True, null=True)
+    brca_mutation = models.CharField(max_length=10, blank=True, null=True)
+    ki67_level = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    tumor_grade = models.CharField(max_length=5, blank=True, null=True)
+    lymph_node_status = models.CharField(max_length=10, blank=True, null=True)
+    positive_lymph_nodes = models.IntegerField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'pathological_profiles'
+
+
 class BreastCancerData(models.Model):
     # Основная информация
     full_name = models.CharField(max_length=200, verbose_name="ФИО пациента")
@@ -7,10 +37,10 @@ class BreastCancerData(models.Model):
     age = models.IntegerField(verbose_name="Возраст")
     gender = models.CharField(max_length=10, choices=[('male', 'Мужской'), ('female', 'Женский')], verbose_name="Пол")
     menopausal_status = models.CharField(max_length=20, choices=[
-    ('premenopausal', 'Пременопауза'),
-    ('perimenopausal', 'Перименопауза'), 
-    ('postmenopausal', 'Постменопауза'),
-    ('not_applicable', 'Не применимо')
+        ('premenopausal', 'Пременопауза'),
+        ('perimenopausal', 'Перименопауза'), 
+        ('postmenopausal', 'Постменопауза'),
+        ('not_applicable', 'Не применимо')
     ], default='not_applicable', verbose_name="Менопаузальный статус")
     
     # Анамнез и генетика
@@ -39,10 +69,10 @@ class BreastCancerData(models.Model):
     
     # Лечение
     treatment = models.CharField(max_length=50, choices=[
-    ('surgery', 'Хирургическое лечение'),
-    ('surgery_chemotherapy', 'Хирургия и Химиотерапия'),
-    ('surgery_targeted', 'Хирургия и Таргетная терапия'),
-    ('none', 'Лечение не проводилось')
+        ('surgery', 'Хирургическое лечение'),
+        ('surgery_chemotherapy', 'Хирургия и Химиотерапия'),
+        ('surgery_targeted', 'Хирургия и Таргетная терапия'),
+        ('none', 'Лечение не проводилось')
     ], verbose_name="Тип лечения")
     surgery_type = models.CharField(max_length=20, choices=[
         ('lumpectomy', 'Лампэктомия'),
@@ -62,9 +92,13 @@ class BreastCancerData(models.Model):
         (0, '0 - Полностью активен'),
         (1, '1 - Ограниченно активен'),
         (2, '2 - Амбулаторный'),
-        (3, '3 - Ограниченно самостоятельный'),
+        (3, '3 - Ограниченно самостояственный'),
         (4, '4 - Полностью нетрудоспособен')
     ], verbose_name="Статус по шкале ECOG")
+    
+    # Добавляем поля даты создания и обновления
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
     
     def __str__(self):
         return f"{self.full_name} - Стадия {self.stage}"
