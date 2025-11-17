@@ -2,7 +2,7 @@ name: Deploy HTML site to GitHub Pages
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ develop ]  # Изменено с main/master на develop
   workflow_dispatch:
 
 permissions:
@@ -16,10 +16,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        
+        with:
+          ref: develop  # Явно указываем ветку develop
+          
       - name: Create .nojekyll file
         run: |
-          # Создаем .nojekyll файл в папке с сайтом
+          # Создаем .nojekyll в правильной папке
           touch src/tumor_model/templates/.nojekyll
           
       - name: Setup Pages
@@ -28,7 +30,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: 'src/tumor_model/templates/'
+          path: 'src/tumor_model/templates/'  # Папка с вашим index.html
           
       - name: Deploy to GitHub Pages
         id: deployment
